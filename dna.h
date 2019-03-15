@@ -17,10 +17,10 @@ private:
     float x2;
     float fitness;
 
-    std::default_random_engine generator;
+    float fitnessFunction();
 
 public:
-    dna();
+    dna(std::default_random_engine& generator);
     dna(float x1, float x2);
 
     float getX1();
@@ -29,7 +29,7 @@ public:
 
     void evaluateFitness();
     dna crossover(dna *partner);
-    void mutate(float mutationRate);
+    void mutate(float mutationRate, std::default_random_engine& generator);
 
 };
 

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <ctime>
 
 #include "dna.h"
 
@@ -9,11 +8,18 @@
 
 using namespace std;
 
-void populate(vector<dna> *population);
+void populate(vector<dna> *population, std::default_random_engine& generator);
 
 int main() {
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+
     auto *population = new vector<dna>;
-    populate(population);
+    populate(population, generator);
+
+    for (unsigned int i = 0; i < TOTAL_POPULATION; i++) {
+        cout << "(" << (population->at(i)).getX1() << ", " << (population->at(i)).getX2() << ")" << endl;
+    }
 
     int generationCounter = 1;
     while (generationCounter < 1000) {
@@ -30,18 +36,17 @@ int main() {
         }
 
         // 2. crossover DNAs to generate a new population
-        std::default_random_engine engine;
         std::uniform_int_distribution<unsigned int> matingDistribution(0, population->size() + 1);
         for (unsigned int i = 0; i < TOTAL_POPULATION; i++) {
-            unsigned int dadIndex = matingDistribution(engine);
-            unsigned int momIndex = matingDistribution(engine);
+            unsigned int dadIndex = matingDistribution(generator);
+            unsigned int momIndex = matingDistribution(generator);
 
             dna dad = matingPool.at(dadIndex);
             dna mom = matingPool.at(momIndex);
 
             dna child = dad.crossover(&mom);
 
-            child.mutate(MUTATION_RATE);
+            child.mutate(MUTATION_RATE, generator);
             child.evaluateFitness();
 
             population->at(i) = child;
@@ -58,8 +63,8 @@ int main() {
     return 0;
 }
 
-void populate(vector<dna> *population) {
+void populate(vector<dna> *population, std::default_random_engine& generator) {
     for (int i = 0; i < TOTAL_POPULATION; i++) {
-        population->push_back(dna());
+        population->push_back(dna(generator));
     }
 }
